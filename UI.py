@@ -98,9 +98,10 @@ class MainWindow(QMainWindow):
         self.ax.xaxis.set_ticks_position('bottom')
         self.ax.yaxis.set_ticks_position('left')
 
-    def plotCanvas(self, dispEnvPos1, forceEnvPos1, x, y, negEnv):
+    def plotCanvas(self, x, y, negEnv, posEnv):
        
-        self.ax.plot(dispEnvPos1, forceEnvPos1, marker='.', color='r', label='Envelop curve')
+        #self.ax.plot(dispEnvPos1, forceEnvPos1, marker='.', color='r', label='Envelop curve')
+        self.ax.plot(posEnv[:,0], posEnv[:,1], marker='.', color='r', label='Envelop curve')
         self.ax.plot(x, y, linewidth=0.5, color='b', label='Hysteresis plot')
         self.ax.plot(negEnv[:,0], negEnv[:,1], marker='.', color='r')
         self.ax.set_title("Hysteresis Graph")
@@ -108,7 +109,7 @@ class MainWindow(QMainWindow):
 
         self.canvas.draw()
         
-        self.createTable(dispEnvPos1, forceEnvPos1, negEnv[:,1], negEnv[:,0])
+        self.createTable(posEnv[:,0], posEnv[:,1], negEnv[:,1], negEnv[:,0])
 
     def createTable(self, disp1, force1, force2, disp2):
         if self.table is not None: 

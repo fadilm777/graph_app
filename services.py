@@ -12,7 +12,7 @@ class FileService(QFileDialog):
         
         self.filenames = None
         self.setFileMode(QFileDialog.FileMode.ExistingFiles)
-        self.setNameFilter("excel files (*.xlsx *xls)")
+        self.setNameFilter("excel files (*.xlsx *xls *csv)")
         
         if self.exec_():
             self.getFiles()

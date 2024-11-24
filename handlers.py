@@ -10,7 +10,10 @@ def graphGenerator(path: str, window):
     """
     window.ax.cla()
     window._initCanvas()
-    dataframe = pd.read_excel(path, skiprows=5, usecols="A:B", header=None)
+    if (path.split('.')[-1] == "csv"):
+        dataframe = pd.read_csv(path, skiprows=5, usecols=[0, 1], header=None)
+    else:
+        dataframe = pd.read_excel(path, skiprows=5, usecols="A:B", header=None)
     
     force = pd.Series(pd.to_numeric(dataframe.iloc[:, 1], errors="coerce")).dropna()
     dispersion = pd.Series(pd.to_numeric(dataframe.iloc[:, 0], errors="coerce")).dropna()
@@ -32,7 +35,6 @@ def graphGenerator(path: str, window):
     
     posIndices = []
     negIndices = []
-    
     for i in range(1, len(dispEnvPos1)):
         if(dispEnvPos1[i] < dispEnvPos1[i-1]):
             posIndices.append(i)
@@ -40,8 +42,7 @@ def graphGenerator(path: str, window):
     posEnvTemp = (np.vstack((dispEnvPos1[posIndices], forceEnvPos1[posIndices]))).T
     zeroArray = np.array([[0., 0.]])
     posEnv = np.vstack((posEnvTemp, zeroArray))
-    print(posEnv)
-    
+
     for i in range(1, len(dispEnvNeg1)):
         if(dispEnvNeg1[i] > dispEnvNeg1[i-1]):
             negIndices.append(i)
@@ -49,4 +50,4 @@ def graphGenerator(path: str, window):
     negEnvTemp = (np.vstack((dispEnvNeg1[negIndices], forceEnvNeg1[negIndices]))).T
     zeroArray = np.array([[0., 0.]])
     negEnv = np.vstack((negEnvTemp, zeroArray))
-    window.plotCanvas(dispEnvPos1=dispEnvPos1, forceEnvPos1=forceEnvPos1, x=x, y=y, negEnv=negEnv)
+    window.plotCanvas(x=x, y=y, negEnv=negEnv, posEnv=posEnv)
