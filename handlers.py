@@ -4,6 +4,10 @@ import numpy as np
 from scipy.spatial import ConvexHull
 
 def graphGenerator(path: str, window):
+    """
+    A function that takes file path and an object of class MainWindow() 
+    and returns x/y values of the hysteresis plot as well as the backbone curve.
+    """
     window.ax.cla()
     window._initCanvas()
     dataframe = pd.read_excel(path, skiprows=5, usecols="A:B", header=None)
@@ -36,6 +40,7 @@ def graphGenerator(path: str, window):
     posEnvTemp = (np.vstack((dispEnvPos1[posIndices], forceEnvPos1[posIndices]))).T
     zeroArray = np.array([[0., 0.]])
     posEnv = np.vstack((posEnvTemp, zeroArray))
+    print(posEnv)
     
     for i in range(1, len(dispEnvNeg1)):
         if(dispEnvNeg1[i] > dispEnvNeg1[i-1]):

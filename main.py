@@ -1,9 +1,6 @@
 from PyQt5.QtWidgets import QApplication
-from UI import Button, MainWindow
+from UI import MainWindow
 import sys
-
-from services import FileService
-
 
 app = QApplication(sys.argv)
 window = MainWindow("Graphing Application")

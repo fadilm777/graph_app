@@ -4,6 +4,7 @@ from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QLabel, QMainWindow, QHBoxLayout, QPushButton, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -12,7 +13,11 @@ from handlers import graphGenerator
 from services import FileService
 
 class MainWindow(QMainWindow):
-
+    """
+    This class inherits from QMainWindow(). 
+    When an instance of this class is created, it initializes the main window structure 
+    of the application such as layout, buttons and graph.
+    """
     def __init__(self, title: str):
         super(MainWindow, self).__init__()
 
@@ -31,7 +36,7 @@ class MainWindow(QMainWindow):
         self.table = None
 
     def _addImport(self):
-        button = Button("Import csv", self.fileAdder)
+        button = Button("Import file", self.fileAdder)
         self.widgets.addWidget(button)
 
     def _layoutInit(self):
@@ -95,40 +100,60 @@ class MainWindow(QMainWindow):
 
     def plotCanvas(self, dispEnvPos1, forceEnvPos1, x, y, negEnv):
        
-        self.ax.plot(dispEnvPos1, forceEnvPos1, marker='.', color='r')
-        self.ax.plot(x, y, linewidth=0.5, color='b')
+        self.ax.plot(dispEnvPos1, forceEnvPos1, marker='.', color='r', label='Envelop curve')
+        self.ax.plot(x, y, linewidth=0.5, color='b', label='Hysteresis plot')
         self.ax.plot(negEnv[:,0], negEnv[:,1], marker='.', color='r')
-        
+        self.ax.set_title("Hysteresis Graph")
+        self.ax.legend()
+
         self.canvas.draw()
         
         self.createTable(dispEnvPos1, forceEnvPos1, negEnv[:,1], negEnv[:,0])
 
-    def createTable(self, force1, disp1, force2, disp2):
-        if self.table is not None: self.widgets.removeWidget(self.table)
-        
+    def createTable(self, disp1, force1, force2, disp2):
+        if self.table is not None: 
+            self.widgets.removeWidget(self.table)
+            self.widgets.removeWidget(self.tableTitle)
+
         self.table = QTableWidget()
         self.table.setRowCount(force1.size)
-        self.table.setColumnCount(2)
+        self.table.setColumnCount(3)
+        
+        x=[]
+        y=[]
         
         for i in range(force1.size):
             self.table.setItem(i, 0, QTableWidgetItem(f"{force1[i]:.3f}"))
-        
+            y.append(force1[i])
+
         for i in range(force1.size):
             self.table.setItem(i, 1, QTableWidgetItem(f"{disp1[i]:.3f}"))
-        
+            x.append(disp1[i])
+
         for i in range(force2.size):
             self.table.setItem(i, 0, QTableWidgetItem(f"{force2[i]:.3f}"))
-        
+            y.append(force2[i])
+
         for i in range(force2.size):
             self.table.setItem(i, 1, QTableWidgetItem(f"{disp2[i]:.3f}"))       
-        
+            x.append(disp2[i])
+
         self.table.setMaximumWidth(300)
-        self.table.setHorizontalHeaderLabels(["Force", "Displacement"])
+        self.table.setHorizontalHeaderLabels(["Force", "Displacement", "Area"])
+
+        area = np.trapz(y,x)
+        self.table.setItem(0, 2, QTableWidgetItem(f"{area:.3f}"))
         
+        self.tableTitle = QLabel("Envelope curve table")
+        self.tableTitle.setStyleSheet("font-size: 16px; font-weight: bold; text-align: center;")
+        self.widgets.insertWidget(1, self.tableTitle)
+
         self.widgets.addWidget(self.table)
 
 class Button(QPushButton):
-
+    """
+    A custom class that inherits from QPushButton(). Represents a button component.
+    """
     def __init__(self, title: str, func: Callable, minw=200, maxw=200):
         super(Button, self).__init__(title)
        
