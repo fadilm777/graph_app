@@ -28,26 +28,32 @@ def graphGenerator(path: str, window):
     dfPos = data[(data[:, 0] > 0) & (data[:, 1] > 0)]
     dfNeg = data[(data[:, 0] < 0) & (data[:, 1] < 0)]
     
-    boundaryPos = ConvexHull(dfPos)
-    dispEnvPos1, forceEnvPos1 = dfPos[boundaryPos.vertices, 0], dfPos[boundaryPos.vertices, 1]
-    boundaryNeg = ConvexHull(dfNeg)
-    dispEnvNeg1, forceEnvNeg1 = dfNeg[boundaryNeg.vertices, 0], dfNeg[boundaryNeg.vertices, 1]
-    
-    posIndices = []
-    negIndices = []
-    for i in range(1, len(dispEnvPos1)):
-        if(dispEnvPos1[i] < dispEnvPos1[i-1]):
-            posIndices.append(i)
-    
-    posEnvTemp = (np.vstack((dispEnvPos1[posIndices], forceEnvPos1[posIndices]))).T
-    zeroArray = np.array([[0., 0.]])
-    posEnv = np.vstack((posEnvTemp, zeroArray))
+    max = 0
+    xmax = 0
+    max_list = []
+    x_max = []
+    min = 0
+    xmin = 0
+    min_list = []
+    x_min = []
 
-    for i in range(1, len(dispEnvNeg1)):
-        if(dispEnvNeg1[i] > dispEnvNeg1[i-1]):
-            negIndices.append(i)
-    
-    negEnvTemp = (np.vstack((dispEnvNeg1[negIndices], forceEnvNeg1[negIndices]))).T
-    zeroArray = np.array([[0., 0.]])
-    negEnv = np.vstack((negEnvTemp, zeroArray))
-    window.plotCanvas(x=x, y=y, negEnv=negEnv, posEnv=posEnv)
+    for i in range(len(x)):
+        
+        if( x[i] > 0 and y[i] > 0 ):
+            if ((min not in min_list) and (min !=0)):
+                min_list.append(min)
+                x_min.append(xmin)
+
+            if ( y[i] > max):
+                max = y[i]
+                xmax = x[i]
+
+        elif ( x[i] < 0 and y[i] < 0):
+            if max not in max_list: 
+                max_list.append(max)
+                x_max.append(xmax)
+
+            if (y[i] < min):
+                min = y[i]
+                xmin = x[i]
+    window.plotCanvas(x, y, max_list, min_list, x_max, x_min)

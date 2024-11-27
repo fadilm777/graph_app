@@ -98,18 +98,17 @@ class MainWindow(QMainWindow):
         self.ax.xaxis.set_ticks_position('bottom')
         self.ax.yaxis.set_ticks_position('left')
 
-    def plotCanvas(self, x, y, negEnv, posEnv):
+    def plotCanvas(self, x, y, max, min, x_max, x_min):
        
-        #self.ax.plot(dispEnvPos1, forceEnvPos1, marker='.', color='r', label='Envelop curve')
-        self.ax.plot(posEnv[:,0], posEnv[:,1], marker='.', color='r', label='Envelop curve')
         self.ax.plot(x, y, linewidth=0.5, color='b', label='Hysteresis plot')
-        self.ax.plot(negEnv[:,0], negEnv[:,1], marker='.', color='r')
+        self.ax.plot(x_min, min, marker='.', color='r', label='Backbone curve')
+        self.ax.plot(x_max, max, marker='.', color='r')
         self.ax.set_title("Hysteresis Graph")
         self.ax.legend()
 
         self.canvas.draw()
         
-        self.createTable(posEnv[:,0], posEnv[:,1], negEnv[:,1], negEnv[:,0])
+        self.createTable(x_max, max, min, x_min)
 
     def createTable(self, disp1, force1, force2, disp2):
         if self.table is not None: 
@@ -117,26 +116,22 @@ class MainWindow(QMainWindow):
             self.widgets.removeWidget(self.tableTitle)
 
         self.table = QTableWidget()
-        self.table.setRowCount(force1.size)
+        self.table.setRowCount(len(force1) + len(force2))
         self.table.setColumnCount(3)
         
         x=[]
         y=[]
         
-        for i in range(force1.size):
+        for i in range(len(force1)):
             self.table.setItem(i, 0, QTableWidgetItem(f"{force1[i]:.3f}"))
             y.append(force1[i])
-
-        for i in range(force1.size):
             self.table.setItem(i, 1, QTableWidgetItem(f"{disp1[i]:.3f}"))
             x.append(disp1[i])
 
-        for i in range(force2.size):
-            self.table.setItem(i, 0, QTableWidgetItem(f"{force2[i]:.3f}"))
+        for i in range(len(force2)):
+            self.table.setItem(i + len(force1), 0, QTableWidgetItem(f"{force2[i]:.3f}"))
             y.append(force2[i])
-
-        for i in range(force2.size):
-            self.table.setItem(i, 1, QTableWidgetItem(f"{disp2[i]:.3f}"))       
+            self.table.setItem(i + len(force1), 1, QTableWidgetItem(f"{disp2[i]:.3f}"))       
             x.append(disp2[i])
 
         self.table.setMaximumWidth(300)
