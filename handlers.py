@@ -1,7 +1,5 @@
 import pandas as pd
-import numpy as np
 
-from scipy.spatial import ConvexHull
 
 def graphGenerator(path: str, window):
     """
@@ -41,8 +39,11 @@ def graphGenerator(path: str, window):
         
         if( x[i] > 0 and y[i] > 0 ):
             if ((min not in min_list) and (min !=0)):
-                min_list.append(min)
-                x_min.append(xmin)
+                if ( len(x_min) == 0 or abs(xmin) > abs(x_min[-1])):
+                    min_list.append(min)
+                    x_min.append(xmin)
+                min = 0
+                xmin = 0
 
             if ( y[i] > max):
                 max = y[i]
@@ -50,10 +51,14 @@ def graphGenerator(path: str, window):
 
         elif ( x[i] < 0 and y[i] < 0):
             if max not in max_list: 
-                max_list.append(max)
-                x_max.append(xmax)
+                if ( len(x_max) == 0 or xmax > x_max[-1]):
+                    max_list.append(max)
+                    x_max.append(xmax)
+                max = 0
+                xmax = 0
 
             if (y[i] < min):
                 min = y[i]
                 xmin = x[i]
+
     window.plotCanvas(x, y, max_list, min_list, x_max, x_min)
